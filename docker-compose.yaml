@@ -1,0 +1,57 @@
+version: "3"
+
+services:
+  db:
+    container_name: drf_sample_db
+    image: mysql:8.0.28
+    ports:
+      - 3306:3306
+    env_file: ./docker/docker.env
+    volumes:
+      - ./docker/my.cnf:/etc/mysql/conf.d/my.cnf
+    command: --default_authentication_plugin=mysql_native_password
+
+  backend:
+    container_name: drf_book_backend
+    build:
+      context: ./sources
+      dockerfile: Dockerfile
+    volumes:
+      - ./sources/backend/:/workspace/app/backend
+      - ./docker/schema.yaml:/workspace/app/backend/app/schema.yaml
+      - ./docker/schema.yaml:/workspace/app/frontend/packages/api/schema.yaml
+
+      - ./sources/frontend/:/workspace/app/frontend
+    command: poetry run python /workspace/app/backend/app/manage.py runserver 0.0.0.0:8000
+    tty: true
+    ports:
+      - 8000:8000
+      - 3000:3000
+      - 3001:3001
+    depends_on:
+      - db
+
+  # frontend:
+  #   container_name: drf_book_frontend
+  #   build:
+  #     context: ./sources
+  #     dockerfile: Dockerfile
+  #   # volumes:
+  #   # - .
+  #   tty: true
+  #   ports:
+  #     - 3000:3000
+  #     - 3001:3001
+
+  mock:
+    container_name: drf_book_mock
+    image: stoplight/prism:4
+    command: "mock -d -h 0.0.0.0 -p 4010 /tmp/schema.yaml"
+    tty: true
+    volumes:
+      - ./docker/schema.yaml:/tmp/schema.yaml:ro
+    ports:
+      - 4010:4010
+
+volumes:
+  postgres_data:

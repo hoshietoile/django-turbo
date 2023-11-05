@@ -1,0 +1,14 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "scripts": {
+    "generate:types": "npx openapi-codegen gen api"
+  },
+  "devDependencies": {
+    "@openapi-codegen/cli": "^2.0.0",
+    "@openapi-codegen/typescript": "^8.0.0"
+  }
+}

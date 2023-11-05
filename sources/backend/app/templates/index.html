@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRF Sample</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/vuetify@3.1.1/dist/vuetify.min.css"
+  /> 
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" 
+  />
+  <style>
+    #message {
+      min-height: 110px;
+    }
+    .v-btn {
+      text-transform: none;
+    }
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<div id="app" v-cloak>
+  <v-app>
+    <v-app-bar id="header" color="grey-darken-4">
+      <v-app-bar-title>
+        <v-btn href="/">DRF Sample</v-btn>
+      </v-app-bar-title>
+      <template v-slot:append>
+        {% if user.is_authenticated %}
+        <v-btn>
+          {{ user.get_username }}
+          <v-menu activator="parent">
+            <v-list>
+              <v-list-item-title>
+                <v-form action="{% url 'rest_framework:logout' %}" method="post">
+                  {% csrf_token %}
+                  <v-btn variant="flat" type="submit">
+                    Logout
+                  </v-btn>
+                </v-form>
+              </v-list-item-title>
+            </v-list>
+          </v-menu>
+        </v-btn>
+        {% else %}
+        <v-btn href="{% url 'rest_framework:login' %}">
+          Login
+        </v-btn>
+        {% endif %}
+      </template>
+    </v-app-bar>
+
+    <v-main>
+      <v-container id="message">
+        <v-alert type="error" density="comfortable" v-show="errorMessage">
+          ${ errorMessage }
+        </v-alert>
+        <v-alert
+          type="warning"
+          density="comfortable"
+          v-show="warningMessages.length > 0"
+        >
+          <p v-for="warningMessage in warningMessages" :key="warningMessage">
+            ${ warningMessage }
+          </p>
+        </v-alert>
+        <v-alert type="info" density="comfortable" v-show="infoMessage">
+          ${ infoMessage }
+        </v-alert>
+      </v-container>
+
+      <v-container id="form">
+        <v-card class="mx-auto pa-8" elevation="4" with="600">
+          <v-card-title class="mb-8">
+            Home
+          </v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-text-field v-model="bookTitle" label="Title"></v-text-field>
+              <v-text-field v-model="bookPrice" label="Price"></v-text-field>
+            </v-form>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn
+              variant="elevated"
+              color="success"
+              class="mx-auto"
+              @click="submitSave"
+            >
+              ${ isCreated ? 'Update' : 'Register' }
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-container>
+
+      <v-container id="debug">
+        <pre>
+          bookTitle: ${ bookTitle }
+          bookPrice: ${ bookPrice }
+          bookId: ${ bookId }
+          errorMessage: ${ errorMessage }
+          warningMessage: ${ warningMessage }
+          infoMessage: ${ infoMessage }
+          isCreated: ${ isCreated }
+        </pre>
+      </v-container>
+    </v-main>
+  </v-app>
+</div> 
+
+<script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver,  ResizeObserver,WebAnimations,Object.fromEntries,Array.prototype.at"></script> 
+<script src="https://cdn.jsdelivr.net/npm/vuetify@3.1.1/dist/vuetify.min.js">  </script> 
+<script src="https://unpkg.com/axios@1.2.2/dist/axios.min.js"></script>
+<script>
+  const { createApp, ref, computed } = Vue;
+  const { createVuetify } = Vuetify;
+
+  axios.defaults.xsrfCookieName = "csrftoken";
+  axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
+  const api = axios.create({
+    baseURL: "/api/v1/",
+    timeout: 5000,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+    },
+  });
+
+  const app = createApp({
+    setup() {
+      const bookTitle = ref("");
+      const bookPrice = ref(0);
+      const bookId = ref();
+      const errorMessage = ref("");
+      const warningMessages = ref([]);
+      const infoMessage = ref("");
+
+      const isCreated = computed(() => {
+        return bookId.value !== undefined;
+      });
+
+      const clearMessages = () => {
+        errorMessage.value = "";
+        warningMessages.value = [];
+        infoMessage.value = "";
+      };
+
+      const submitSave = () => {
+        clearMessages();
+        api({
+          method: isCreated.value ? "put" : "post",
+          url: isCreated.value ? "/books/" + bookId.value + "/" : "/books/",
+          data: {
+            id: bookId.value,
+            title: bookTitle.value,
+            price: bookPrice.value,
+          },
+        })
+          .then((response) => {
+            infoMessage.value = isCreated.value
+              ? "Updated"
+              : "Registered";
+            bookId.value = response.data.id;
+            bookTitle.value = response.data.title;
+            bookPrice.value = response.data.price;
+          })
+          .catch((error) => {
+            switch (error.response?.status) {
+              case 400:
+                const messages = Object.values(error.response.data).flat();
+                warningMessages.value = messages;
+                break;
+              case 401:
+                errorMessage.value = "AuthenticationError";
+                break;
+              case 403:
+                errorMessage.value = "PermissionError";
+                break;
+              default:
+                errorMessage.value = "UnexpectedError";
+            }
+          });
+      };
+      return {
+        bookTitle,
+        bookPrice,
+        errorMessage,
+        warningMessages,
+        infoMessage,
+        isCreated,
+        submitSave,
+        bookId,
+      };
+    },
+  });
+  app.config.compilerOptions.delimiters = ["${", "}"];
+  const vuetify = createVuetify();
+  app.use(vuetify);
+  app.mount("#app");
+</script>
+</body>
+</html>
