@@ -1,4 +1,5 @@
 .turbo
 .env
+.pnpm-store
 node_modules
 __pycache__

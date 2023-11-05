@@ -22,7 +22,9 @@ services:
       - ./docker/schema.yaml:/workspace/app/frontend/packages/api/schema.yaml
 
       - ./sources/frontend/:/workspace/app/frontend
-    command: poetry run python /workspace/app/backend/app/manage.py runserver 0.0.0.0:8000
+      - ./sources/Makefile:/workspace/app/Makefile
+    command: make -j dev-backend dev-frontend
+    # command: poetry run python /workspace/app/backend/app/manage.py runserver 0.0.0.0:8000
     tty: true
     ports:
       - 8000:8000
