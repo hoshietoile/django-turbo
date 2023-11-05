@@ -5,6 +5,17 @@
  *
  * @version 0.0.0
  */
+export type AuthRetrieve = {
+  /**
+   * @format uuid
+   */
+  id: string;
+  /**
+   * @maxLength 20
+   */
+  name: string;
+};
+
 export type Book = {
   /**
    * @format uuid
@@ -14,6 +25,43 @@ export type Book = {
    * @maxLength 20
    */
   title: string;
+  /**
+   * @maximum 2147483647
+   * @minimum -2147483648
+   */
+  price?: number | null;
+};
+
+export type BookPDFRequest = {
+  /**
+   * @maxLength 20
+   */
+  title: string;
+  /**
+   * @maximum 2147483647
+   * @minimum -2147483648
+   */
+  price?: number | null;
+  size: SizeEnum;
+};
+
+export type BookPDFResponse = {
+  /**
+   * @format uuid
+   */
+  id: string;
+  /**
+   * @format uri
+   */
+  download_url: string;
+  /**
+   * @maxLength 20
+   */
+  title: string;
+  /**
+   * @maximum 2147483647
+   * @minimum -2147483648
+   */
   price?: number | null;
 };
 
@@ -26,5 +74,69 @@ export type PatchedBook = {
    * @maxLength 20
    */
   title?: string;
+  /**
+   * @maximum 2147483647
+   * @minimum -2147483648
+   */
   price?: number | null;
+};
+
+/**
+ * * `B5` - B5
+ * * `A4` - A4
+ */
+export type SizeEnum = "B5" | "A4";
+
+export type UserCreate = {
+  /**
+   * @maxLength 20
+   */
+  name: string;
+  /**
+   * @maxLength 100
+   */
+  email: string;
+  /**
+   * @maxLength 20
+   */
+  password: string;
+  /**
+   * @maxLength 20
+   */
+  password_confirm: string;
+};
+
+export type UserRetrieve = {
+  /**
+   * @format uuid
+   */
+  id: string;
+  /**
+   * @maxLength 20
+   */
+  name: string;
+  /**
+   * @maxLength 100
+   */
+  email: string;
+  auths: AuthRetrieve[];
+};
+
+export type UserUpdate = {
+  /**
+   * @maxLength 20
+   */
+  name: string;
+  /**
+   * @maxLength 100
+   */
+  email: string;
+  /**
+   * @maxLength 20
+   */
+  password: string;
+  /**
+   * @maxLength 20
+   */
+  password_confirm: string;
 };

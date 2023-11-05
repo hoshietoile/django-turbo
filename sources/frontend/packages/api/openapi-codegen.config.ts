@@ -19,10 +19,10 @@ export default defineConfig({
       const { schemasFiles } = await generateSchemaTypes(context, {
         filenamePrefix
       })
-      await generateReactQueryComponents(context, {
-        filenamePrefix,
-        schemasFiles
-      })
+      // await generateReactQueryComponents(context, {
+      //   filenamePrefix,
+      //   schemasFiles
+      // })
     }
   }
 })

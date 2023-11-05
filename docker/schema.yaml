@@ -147,6 +147,23 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/v1/apitests:
+    get:
+      operationId: v1_apitests_list
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+          description: ''
   /api/v1/books/:
     get:
       operationId: v1_books_list
@@ -294,8 +311,118 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/books/pdf:
+    post:
+      operationId: v1_books_pdf_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookPDFRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BookPDFRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BookPDFRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookPDFResponse'
+          description: ''
+  /api/v1/users:
+    get:
+      operationId: v1_users_list
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRetrieve'
+          description: ''
+    post:
+      operationId: v1_users_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRetrieve'
+          description: ''
+    put:
+      operationId: v1_users_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRetrieve'
+          description: ''
 components:
   schemas:
+    AuthRetrieve:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          title: AuthName
+          maxLength: 20
+      required:
+      - id
+      - name
     Book:
       type: object
       properties:
@@ -308,8 +435,48 @@ components:
           maxLength: 20
         price:
           type: integer
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
       required:
+      - id
+      - title
+    BookPDFRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 20
+        price:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        size:
+          $ref: '#/components/schemas/SizeEnum'
+      required:
+      - size
+      - title
+    BookPDFResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        download_url:
+          type: string
+          format: uri
+        title:
+          type: string
+          maxLength: 20
+        price:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+      required:
+      - download_url
       - id
       - title
     PatchedBook:
@@ -324,7 +491,82 @@ components:
           maxLength: 20
         price:
           type: integer
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
+    SizeEnum:
+      enum:
+      - B5
+      - A4
+      type: string
+      description: |-
+        * `B5` - B5
+        * `A4` - A4
+    UserCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          maxLength: 100
+        password:
+          type: string
+          maxLength: 20
+        password_confirm:
+          type: string
+          title: PasswordConfirm
+          maxLength: 20
+      required:
+      - email
+      - name
+      - password
+      - password_confirm
+    UserRetrieve:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          maxLength: 100
+        auths:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthRetrieve'
+          readOnly: true
+      required:
+      - auths
+      - email
+      - id
+      - name
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          maxLength: 100
+        password:
+          type: string
+          maxLength: 20
+        password_confirm:
+          type: string
+          title: PasswordConfirm
+          maxLength: 20
+      required:
+      - email
+      - name
+      - password
+      - password_confirm
   securitySchemes:
     cookieAuth:
       type: apiKey

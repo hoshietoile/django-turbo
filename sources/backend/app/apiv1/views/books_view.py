@@ -5,25 +5,16 @@ from rest_framework.response import Response
 from shop.models import Book
 from utils.decorators import extend_res
 
-from .serializers import (
+from ..serializers import (
   BookPDFRequestSerializer,
   BookPDFResponseSerializer,
   BookSerializer,
 )
 
-
 class BookViewSet(viewsets.ModelViewSet):
   queryset = Book.objects.all()
   serializer_class = BookSerializer
   permission_classes = [IsAuthenticatedOrReadOnly]
-
-class ApiTestView(views.APIView):
-  @extend_res(req=BookSerializer, res=BookSerializer(many=True))  
-  def get(self, request):
-    """Get a List of Book"""
-    query = Book.objects.all()
-    serializer = BookSerializer(query, many=True)
-    return Response(serializer.data)
 
 class BookPDFApiView(views.APIView):
   # queryset = Book.objects.all()

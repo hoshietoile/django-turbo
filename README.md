@@ -1,3 +1,12 @@
+想定する開発の流れ
+
+1. Model 定義 マイグレーション作成
+2. Serializer 定義
+3. View 作成 各エンドポイントの関数を pass して定義 Res, Req のスキーマだけ指定
+4. make generate-types でフロントエンド、モックに反映
+   TODO:
+5. テストの作成(フローの定義?)
+
 [Common]
 
 ## Pre-commit

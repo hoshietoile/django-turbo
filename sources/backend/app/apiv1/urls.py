@@ -1,13 +1,22 @@
 from django.urls import path, include
 from rest_framework import routers
-from . import views
+# from .views.users_view import UsersView
+# from .views.books_view import BookViewSet, BookPDFApiView
+# from .views.apitest_view import ApiTestView
+from .views import (
+  BookPDFApiView,
+  BookViewSet,
+  ApiTestView,
+  UsersView,
+)
 
 router = routers.DefaultRouter()
-router.register('books', views.BookViewSet)
+router.register('books', BookViewSet)
 
 app_name = 'apiv1'
 urlpatterns = [
-  path('apitests', views.ApiTestView.as_view()),
-  path('books/pdf', views.BookPDFApiView.as_view()),
+  path('apitests', ApiTestView.as_view()),
+  path('users', UsersView.as_view()),
+  path('books/pdf', BookPDFApiView.as_view()),
   path('', include(router.urls)),
 ]

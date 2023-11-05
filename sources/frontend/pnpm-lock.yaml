@@ -72,6 +72,9 @@ importers:
       '@mui/material':
         specifier: ^5.14.16
         version: 5.14.16(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.34)(react-dom@18.2.0)(react@18.2.0)
+      api:
+        specifier: workspace:*
+        version: link:../../packages/api
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -128,8 +131,6 @@ importers:
       '@openapi-codegen/typescript':
         specifier: ^8.0.0
         version: 8.0.0
-
-  packages/berry-template: {}
 
   packages/eslint-config-custom:
     devDependencies:

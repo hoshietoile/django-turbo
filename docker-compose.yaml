@@ -18,7 +18,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./sources/backend/:/workspace/app/backend
-      - ./docker/schema.yaml:/workspace/app/backend/app/schema.yaml
+      - ./docker/schema.yaml:/workspace/app/backend/schema.yaml
       - ./docker/schema.yaml:/workspace/app/frontend/packages/api/schema.yaml
 
       - ./sources/frontend/:/workspace/app/frontend
@@ -51,7 +51,7 @@ services:
     command: "mock -d -h 0.0.0.0 -p 4010 /tmp/schema.yaml"
     tty: true
     volumes:
-      - ./docker/schema.yaml:/tmp/schema.yaml:ro
+      - ./docker/schema.yaml:/tmp/schema.yaml
     ports:
       - 4010:4010
 

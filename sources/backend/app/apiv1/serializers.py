@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shop.models import Book
+from shop.models import Book, User, Auth
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -29,7 +29,31 @@ class BookPDFRequestSerializer(serializers.ModelSerializer):
 
 class BookPDFResponseSerializer(serializers.ModelSerializer):
   download_url = serializers.URLField()
-  
+
   class Meta:
     model = Book
     exclude = ['created_at']
+
+class AuthRetrieveSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Auth
+    fields = [
+      'id',
+      'name',
+    ]
+
+class UserRetrieveSerializer(serializers.ModelSerializer):
+  auths = AuthRetrieveSerializer(many=True, read_only=True)
+  class Meta:
+    model = User
+    fields = ['id', 'name', 'email', 'auths']
+
+class UserCreateSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ['name', 'email', 'password', 'password_confirm']
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ['name', 'email', 'password', 'password_confirm']
